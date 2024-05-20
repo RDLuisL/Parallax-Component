@@ -1,76 +1,109 @@
-//crea elemento
-const video = document.createElement("video");
+//? This code is for animating details
+//? of summary component and slightly modified 
+//? https://css-tricks.com/how-to-animate-the-
+//? details-element-using-waapi/
 
-//nuestro camvas
-const canvasElement = document.getElementById("qr-canvas");
-const canvas = canvasElement.getContext("2d");
+class Accordion {
+  constructor(el) {
+    this.el = el;
+    this.summary = el.querySelector('summary');
+    this.content = el.querySelector('.faq-content');
+    this.expandIcon = this.summary.querySelector('.expand-icon')
+    this.animation = null;
+    this.isClosing = false;
+    this.isExpanding = false;
+    this.summary.addEventListener('click', (e) => this.onClick(e));
+  }
 
-//div donde llegara nuestro canvas
-const btnScanQR = document.getElementById("btn-scan-qr");
+  onClick(e) {
+    e.preventDefault();
+    this.el.style.overflow = 'hidden';
 
-//lectura desactivada
-let scanning = false;
+    if (this.isClosing || !this.el.open) {
+      this.open();
+    } else if (this.isExpanding || this.el.open) {
+      this.shrink();
+    }
+  }
 
-//funcion para encender la camara
-const encenderCamara = () => {
-  navigator.mediaDevices
-    .getUserMedia({ video: { facingMode: "environment" } })
-    .then(function (stream) {
-      scanning = true;
-      btnScanQR.hidden = true;
-      canvasElement.hidden = false;
-      video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
-      video.srcObject = stream;
-      video.play();
-      tick();
-      scan();
+  shrink() {
+    this.isClosing = true;
+
+    const startHeight = `${this.el.offsetHeight}px`;
+    const endHeight = `${this.summary.offsetHeight}px`;
+
+    if (this.animation) {
+      this.animation.cancel();
+    }
+    
+    this.animation = this.el.animate({
+      height: [startHeight, endHeight]
+    }, {
+      duration: 400,
+      easing: 'ease-out'
     });
-};
 
-//funciones para levantar las funiones de encendido de la camara
-function tick() {
-  canvasElement.height = video.videoHeight;
-  canvasElement.width = video.videoWidth;
-  canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+    this.animation.onfinish = () => {
+      this.expandIcon.setAttribute('src', '../plus.svg');
+      return this.onAnimationFinish(false);
+    }
+    this.animation.oncancel = () => {
+      this.expandIcon.setAttribute('src', '../plus.svg');
+      return this.isClosing = false;
+    }
+  }
 
-  scanning && requestAnimationFrame(tick);
-}
+  open() {
+    this.el.style.height = `${this.el.offsetHeight}px`;
+    this.el.open = true;
+    window.requestAnimationFrame(() => this.expand());
+  }
 
-function scan() {
-  try {
-    qrcode.decode();
-  } catch (e) {
-    setTimeout(scan, 300);
+  expand() {
+    this.isExpanding = true;
+
+    const startHeight = `${this.el.offsetHeight}px`;
+    const endHeight = `${this.summary.offsetHeight + 
+                         this.content.offsetHeight}px`;
+
+    if (this.animation) {
+      this.animation.cancel();
+    }
+    
+    this.animation = this.el.animate({
+      height: [startHeight, endHeight]
+    }, {
+      duration: 350,
+      easing: 'ease-out'
+    });
+
+    this.animation.onfinish = () => {
+      this.expandIcon.setAttribute(
+          'src',
+          '../minus.svg'
+      );
+      return this.onAnimationFinish(true);
+    }
+    this.animation.oncancel = () => {
+      this.expandIcon.setAttribute(
+          'src',
+          '../minus.svg'
+      );
+      return this.isExpanding = false;
+    }
+  }
+
+  onAnimationFinish(open) {
+    this.el.open = open;
+    this.animation = null;
+    this.isClosing = false;
+    this.isExpanding = false;
+    this.el.style.height = this.el.style.overflow = '';
   }
 }
 
-//apagara la camara
-const cerrarCamara = () => {
-  video.srcObject.getTracks().forEach((track) => {
-    track.stop();
-  });
-  canvasElement.hidden = true;
-  btnScanQR.hidden = false;
-};
+document.querySelectorAll('details').forEach((el) => {
+  new Accordion(el);
+});
 
-const activarSonido = () => {
-  var audio = document.getElementById('audioScaner');
-  audio.play();
-}
-
-//callback cuando termina de leer el codigo QR
-qrcode.callback = (respuesta) => {
-  if (respuesta) {
-    //console.log(respuesta);
-    Swal.fire(respuesta)
-    activarSonido();
-    //encenderCamara();    
-    cerrarCamara();    
-
-  }
-};
-//evento para mostrar la camara sin el boton 
-window.addEventListener('load', (e) => {
-  encenderCamara();
-})
 
