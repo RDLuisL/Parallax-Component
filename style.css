@@ -27,16 +27,16 @@ body {
 }
 
 .parallax-image-01 {
-    background-image: url("assets/autumn_forest.jpg");
+    background-image: url("assets/3-body-problem_main.jpg");
 }
 
 .parallax-image-02 {
-    background-image: url("assets/forest_pathway.jpg");
+    background-image: url("assets/3_bodys_problem_2.jpeg");
 
 }
 
 .parallax-image-03 {
-    background-image: url("assets/winter_forest.jpg");
+    background-image: url("assets/3_bodys_problem_1.jpeg");
 }
 section {
     padding: 4rem;
