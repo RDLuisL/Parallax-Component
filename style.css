@@ -19,7 +19,7 @@ body {
 
 .parallax-image {
     display: block;
-    height: 10rem;/*gap de imagen*/
+    height: 30rem;/*gap de imagen*/
     width: 100%;
     background-size: cover;
     background-attachment: fixed;
@@ -27,16 +27,16 @@ body {
 }
 
 .parallax-image-01 {
-    background-image: url("assets/parallax 1.png");
+    background-image: url("assets/3_bodys_problem_1.jpeg");
 }
 
 .parallax-image-02 {
-    background-image: url("assets/parallax 2.png");
+    background-image: url("assets/3_bodys_problem_.jpeg");
 
 }
 
 .parallax-image-03 {
-    background-image: url("assets/parallax 3.png");
+    background-image: url("assets/3_bodys_problem_3.jpeg");
 }
 section {
     padding: 4rem;
